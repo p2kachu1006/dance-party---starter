@@ -17,7 +17,19 @@ function setUpStopper () {
     true
     )
 }
+function makeArrow () {
+    randomNumber = randint(0, 3)
+    arrow = sprites.create(arrowImgs[randomNumber], SpriteKind.Food)
+    arrow.y = 0
+    arrow.vy = 70
+    arrow.x = arrowX[randomNumber]
+}
+let arrow: Sprite = null
+let randomNumber = 0
 let stopper: Sprite = null
+let arrowImgs: Image[] = []
+let arrowX: number[] = []
+info.setLife(10)
 scene.setBackgroundImage(img`
     ................................................................................................................................................................
     ................................................................................................................................................................
@@ -140,7 +152,8 @@ scene.setBackgroundImage(img`
     33f99999999999999f33333333333333f9999999999999999f55555555555555f333333333333333f8888888888888888f7777777777777777f33333333333333333333f8888888888888888888888f7
     3f99999999999999f33333333333333f9999999999999999f555555555555555f333333333333333f88888888888888888f7777777777777777f33333333333333333333f8888888888888888888888f
     `)
-let arrowImgs = [img`
+arrowX = [20, 60, 100, 140]
+arrowImgs = [img`
     6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 
     6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 
     6 6 6 6 6 1 6 6 6 6 6 6 6 6 6 6 
@@ -210,3 +223,49 @@ let arrowImgs = [img`
     6 6 6 6 6 6 6 1 6 6 6 6 6 6 6 6 
     `]
 setUpStopper()
+effects.confetti.startScreenEffect()
+let dancer = sprites.create(img`
+    . . . . f f f f f . . . . . . . 
+    . . . f e e e e e f . . . . . . 
+    . . f d d d d e e e f . . . . . 
+    . c d f d d f d e e f f . . . . 
+    . c d f d d f d e e d d f . . . 
+    c d e e d d d d e e b d c . . . 
+    c d d d d c d d e e b d c . . . 
+    c c c c c d d e e e f c . . . . 
+    . f d d d d e e e f f . . . . . 
+    . . f e e e f f e e e f . . . . 
+    . . f f f f f e e e e e f . f f 
+    . . f d b f e e f f e e f . e f 
+    . f f d d f e f f e e e f . e f 
+    . f f f f f f e b b f e f f e f 
+    . f d d f e e e d d b e f f f f 
+    . . f f f f f f f f f f f f f . 
+    `, SpriteKind.Player)
+dancer.y = 100
+controller.left.onEvent(ControllerButtonEvent.Pressed, function() {
+    dancer.x=arrowX[0]
+})
+controller.up.onEvent(ControllerButtonEvent.Pressed, function() {
+    dancer.x=arrowX[1]
+})
+controller.right.onEvent(ControllerButtonEvent.Pressed, function() {
+    dancer.x=arrowX[2]
+})
+controller.down.onEvent(ControllerButtonEvent.Pressed, function() {
+    dancer.x=arrowX[3]
+})
+
+game.onUpdateInterval(1000, function () {
+    makeArrow()
+})
+
+
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function(sprite: Sprite, otherSprite: Sprite) {
+    info.changeScoreBy(1)
+    otherSprite.destroy(effects.rings)
+})
+sprites.onOverlap(SpriteKind.Food, SpriteKind.Enemy, function(sprite: Sprite, otherSprite: Sprite) {
+    info.changeLifeBy(-1)
+    sprite.destroy()
+})
